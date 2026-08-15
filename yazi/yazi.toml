@@ -1,0 +1,6 @@
+# Render Markdown in the preview pane while keeping Yazi's default previewers
+# for every other file type.
+[[plugin.prepend_previewers]]
+url = "*.md"
+run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s="$t" "$1"'
+show_hidden = true
