@@ -1,0 +1,136 @@
+// Zed settings
+//
+// Docs: https://zed.dev/docs/configuring-zed
+// Defaults: `zed: open default settings` (cmd-shift-p)
+
+{
+  "cli_default_open_behavior": "existing_window",
+  "vim_mode": true,
+
+  // ── Хром: оставлено только project panel, недавние проекты и ветка ────────
+  //
+  // В заголовке остаётся кликабельное имя проекта (show_project_items — «project
+  // host and name», это и есть список недавних) и имя git-ветки. Кнопка имени
+  // worktree убрана отдельным ключом: в Zed это самостоятельная кнопка, не то
+  // же самое, что project_items. Меню приложения на macOS живёт в системной
+  // строке и никуда не девается.
+  "title_bar": {
+    "show_project_items": true,
+    "show_branch_name": true,
+    "show_worktree_name": false,
+    "show_branch_status_icon": false,
+    "show_user_menu": false,
+    "show_menus": false,
+    "show_sign_in": false,
+    "show_user_picture": false,
+    "show_onboarding_banner": false
+  },
+  "show_call_status_icon": false,
+
+  // Вкладок нет. Единственное, что остаётся показывать текущий файл, —
+  // хлебные крошки, поэтому они включены намеренно: без них и без вкладок
+  // определить открытый файл будет нечем.
+  "tab_bar": { "show": false },
+  "toolbar": {
+    "breadcrumbs": true,
+    "quick_actions": false,
+    "selections_menu": false,
+    "code_actions": false,
+    "agent_review": false
+  },
+
+  "status_bar": {
+    "active_language_button": false,
+    "cursor_position_button": false
+  },
+
+  "scrollbar": { "show": "never" },
+  "minimap": { "show": "never" },
+
+  // Номера строк остаются: с vim_mode они рабочий инструмент, а не украшение.
+  // Убраны только кликабельные значки на полях.
+  "gutter": {
+    "line_numbers": true,
+    "code_actions": false,
+    "runnables": false,
+    "breakpoints": false,
+    "folds": false
+  },
+
+  // ── Панели ───────────────────────────────────────────────────────────────
+  //
+  // Кнопка в статус-баре есть только у project panel. Остальные панели живы
+  // и открываются из палитры команд — спрятаны именно кнопки.
+  "project_panel": {
+    "dock": "left",
+    "button": true,
+    "indent_guides": { "show": "never" },
+    "scrollbar": { "show": "never" }
+  },
+  "outline_panel": { "dock": "left", "button": false },
+  "collaboration_panel": { "dock": "left", "button": false },
+  "git_panel": { "dock": "left", "button": false },
+  "debugger": { "button": false },
+
+  // ── Тема и текст ─────────────────────────────────────────────────────────
+  //
+  // Cinder — тема лежит в ~/.config/zed/themes/cinder.json
+  // (парная к ~/.config/kitty/cinder.conf, палитра общая)
+  "theme": {
+    "mode": "dark",
+    "dark": "Cinder",
+    "light": "Cinder"
+  },
+
+  "buffer_font_family": "Maple Mono NF",
+  "buffer_font_weight": 500,
+  "buffer_font_size": 13.0,
+  "buffer_line_height": { "custom": 1.6 },
+  "buffer_font_features": { "calt": true, "liga": true },
+
+  "ui_font_family": "IBM Plex Sans",
+  "ui_font_size": 13.0,
+
+  "terminal": {
+    "font_family": "Maple Mono NF",
+    "font_size": 12.5,
+    "line_height": { "custom": 1.4 },
+    "button": false
+  },
+
+  "cursor_blink": false,
+  "current_line_highlight": "line",
+  "show_whitespaces": "selection",
+  "indent_guides": { "enabled": false },
+  "unnecessary_code_fade": 0.4,
+
+  // ── ИИ отключён ──────────────────────────────────────────────────────────
+  //
+  // disable_ai — главный рубильник: при нём Zed не регистрирует панель агента
+  // вообще. show_edit_predictions глушит инлайн-подсказки на уровне редактора,
+  // отдельно от рубильника.
+  //
+  // Прежняя конфигурация агента сохранена ниже закомментированной: чтобы
+  // вернуть всё как было, раскомментируй её и поставь disable_ai в false.
+  "disable_ai": true,
+  "show_edit_predictions": false
+
+  // "agent_buffer_font_size": 12.5,
+  // "agent_ui_font_size": 11.5,
+  // "agent_servers": {
+  //   "claude-acp": { "type": "registry" }
+  // },
+  // "agent": {
+  //   "dock": "right",
+  //   "button": false,
+  //   "default_model": {
+  //     "provider": "openai-subscribed",
+  //     "model": "gpt-5.6-luna",
+  //     "enable_thinking": true,
+  //     "effort": "medium"
+  //   },
+  //   "favorite_models": [],
+  //   "model_parameters": [],
+  //   "auto_compact": { "threshold": "90%" }
+  // }
+}

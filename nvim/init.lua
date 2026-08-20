@@ -7,7 +7,16 @@ local opt = vim.opt
 opt.mouse = "a"
 opt.number = true
 opt.relativenumber = false
-opt.clipboard = "unnamedplus"
+-- Буфер обмена. На macOS провайдер встроен, на Linux нужен внешний: без
+-- wl-copy/xclip/xsel настройка unnamedplus печатает "clipboard: No provider"
+-- на каждый рывок, поэтому включаем её только когда есть чем работать.
+if vim.fn.has("mac") == 1
+  or vim.fn.executable("wl-copy") == 1
+  or vim.fn.executable("xclip") == 1
+  or vim.fn.executable("xsel") == 1
+then
+  opt.clipboard = "unnamedplus"
+end
 opt.termguicolors = true
 opt.background = "dark"
 opt.signcolumn = "yes"
@@ -23,104 +32,15 @@ opt.updatetime = 500
 opt.timeoutlen = 400
 opt.completeopt = { "menuone", "noselect" }
 opt.undofile = true
-opt.laststatus = 3
+opt.pumheight = 12
+opt.winborder = "rounded"     -- плавающие окна скруглены, как панели Zed
 
--- Kitty's dim-glass palette. The terminal still owns the font.
-local function apply_dim_glass()
-  local c = {
-    bg = "#1f2327",
-    panel = "#24282d",
-    border = "#4a525b",
-    fg = "#c8ccd1",
-    bright = "#dfe3e8",
-    muted = "#7c848e",
-    faint = "#4e565f",
-    red = "#d08c86",
-    green = "#9bb88a",
-    yellow = "#d3ae7a",
-    blue = "#8fa8c9",
-    magenta = "#b79ac0",
-    cyan = "#86afb5",
-    selection = "#3a4149",
-  }
+-- Cinder — палитра в colors/cinder.lua, общая с kitty и Zed.
+-- Шрифтом владеет терминал (Maple Mono NF), тема его не трогает.
+vim.cmd.colorscheme("cinder")
 
-  local groups = {
-    Normal = { fg = c.fg, bg = c.bg },
-    NormalFloat = { fg = c.fg, bg = c.panel },
-    SignColumn = { bg = c.bg },
-    EndOfBuffer = { fg = c.bg, bg = c.bg },
-    CursorLine = { bg = c.panel },
-    CursorLineNr = { fg = c.yellow, bold = true },
-    LineNr = { fg = c.muted },
-    WinSeparator = { fg = c.border },
-    VertSplit = { fg = c.border },
-    FloatBorder = { fg = c.border, bg = c.panel },
-    Pmenu = { fg = c.fg, bg = c.panel },
-    PmenuSel = { fg = c.bright, bg = c.selection },
-    Search = { fg = c.bg, bg = c.yellow },
-    IncSearch = { fg = c.bg, bg = c.cyan },
-    Visual = { bg = c.selection },
-    Comment = { fg = c.muted },
-    Constant = { fg = c.cyan },
-    String = { fg = c.green },
-    Character = { fg = c.green },
-    Number = { fg = c.cyan },
-    Boolean = { fg = c.cyan },
-    Identifier = { fg = c.fg },
-    Function = { fg = c.blue },
-    Statement = { fg = c.magenta },
-    Keyword = { fg = c.magenta },
-    Type = { fg = c.yellow },
-    Special = { fg = c.cyan },
-    Error = { fg = c.red },
-    DiagnosticError = { fg = c.red },
-    DiagnosticWarn = { fg = c.yellow },
-    DiagnosticInfo = { fg = c.cyan },
-    DiagnosticHint = { fg = c.muted },
-    DiagnosticUnderlineError = { undercurl = true, sp = c.red },
-    DiagnosticUnderlineWarn = { undercurl = true, sp = c.yellow },
-    DiagnosticUnderlineInfo = { undercurl = true, sp = c.cyan },
-    DiagnosticUnderlineHint = { undercurl = true, sp = c.muted },
-    DiffAdd = { fg = c.green, bg = "#293329" },
-    DiffChange = { fg = c.yellow, bg = "#332f25" },
-    DiffDelete = { fg = c.red, bg = "#332827" },
-    DiffText = { fg = c.bright, bg = "#3b3629" },
-    Added = { fg = c.green },
-    Changed = { fg = c.yellow },
-    Removed = { fg = c.red },
-    GitSignsAdd = { fg = c.green, bg = c.bg },
-    GitSignsChange = { fg = c.yellow, bg = c.bg },
-    GitSignsDelete = { fg = c.red, bg = c.bg },
-    -- Tree-sitter captures.
-    ["@comment"] = { fg = c.muted },
-    ["@string"] = { fg = c.green },
-    ["@number"] = { fg = c.cyan },
-    ["@boolean"] = { fg = c.cyan },
-    ["@constant"] = { fg = c.cyan },
-    ["@variable"] = { fg = c.fg },
-    ["@parameter"] = { fg = c.fg },
-    ["@function"] = { fg = c.blue },
-    ["@function.call"] = { fg = c.blue },
-    ["@method"] = { fg = c.blue },
-    ["@method.call"] = { fg = c.blue },
-    ["@keyword"] = { fg = c.magenta },
-    ["@type"] = { fg = c.yellow },
-    ["@property"] = { fg = c.cyan },
-    ["@operator"] = { fg = c.fg },
-    ["@punctuation.bracket"] = { fg = c.muted },
-    ["@punctuation.delimiter"] = { fg = c.muted },
-    ["@lsp.type.function"] = { fg = c.blue },
-    ["@lsp.type.method"] = { fg = c.blue },
-    ["@lsp.type.type"] = { fg = c.yellow },
-  }
-
-  for group, style in pairs(groups) do
-    vim.api.nvim_set_hl(0, group, style)
-  end
-  vim.g.colors_name = "dim-glass"
-end
-
-apply_dim_glass()
+-- Хром в духе Zed: нет вкладок, есть хлебные крошки и тихая нижняя строка.
+require("zed_ui").setup()
 
 -- Bootstrap the small plugin manager.
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -132,10 +52,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 opt.rtp:prepend(lazypath)
 
-local treesitter_languages = {
-  "bash", "go", "gomod", "gowork", "json", "lua", "markdown",
-  "markdown_inline", "query", "toml", "vim", "vimdoc", "yaml",
-}
+local treesitter_languages = require("languages")
 
 require("lazy").setup({
   {
@@ -198,6 +115,9 @@ require("lazy").setup({
         renderer = {
           group_empty = true,
           highlight_git = "name",
+          -- Без подписи корня: путь уже виден в нижней строке (имя проекта)
+          -- и в хлебных крошках над буфером, третий раз он лишний.
+          root_folder_label = false,
           icons = {
             web_devicons = {
               file = { enable = true, color = true },
@@ -234,17 +154,7 @@ require("lazy").setup({
             desc = "Open with single click",
             silent = true,
           })
-          for group, color in pairs({
-            NvimTreeGitNew = "#9bb88a",
-            NvimTreeGitStaged = "#9bb88a",
-            NvimTreeGitDirty = "#d3ae7a",
-            NvimTreeGitRenamed = "#8fa8c9",
-            NvimTreeGitDeleted = "#d08c86",
-            NvimTreeGitMerge = "#b79ac0",
-            NvimTreeGitIgnored = "#7c848e",
-          }) do
-            vim.api.nvim_set_hl(0, group, { fg = color })
-          end
+          -- Цвета NvimTreeGit* задаёт colors/cinder.lua.
         end,
       })
     end,
@@ -408,7 +318,9 @@ vim.api.nvim_create_autocmd("CursorHold", {
         source = "if_many",
       })
     elseif #vim.lsp.get_clients({ bufnr = args.buf }) > 0 then
-      vim.lsp.buf.hover({ focus = false, border = "rounded" })
+      -- silent: без него каждая пауза на символе без документации печатает
+      -- "No information available". Ручной K намеренно оставлен болтливым.
+      vim.lsp.buf.hover({ focus = false, border = "rounded", silent = true })
     end
   end,
 })
@@ -417,4 +329,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     vim.bo[args.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
   end,
+})
+
+-- nvim-tree и другие плагины с lazy=false выставляют собственные группы во
+-- время инициализации. Один перекрас после старта возвращает палитру Cinder.
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function() vim.cmd.colorscheme("cinder") end,
 })
